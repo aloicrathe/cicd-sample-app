@@ -3,6 +3,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
+                sh 'rm -rf tempdir'
                 catchError(buildResult: 'SUCCESS') {
                     sh 'docker stop samplerunning'
                     sh 'docker rm samplerunning'
