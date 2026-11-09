@@ -1,14 +1,23 @@
-  node {
+pipeline {
+    agent any
+    stages {
         stage('Preparation') {
-            catchError(buildResult: 'SUCCESS') {
-                sh 'docker stop samplerunning'
-                sh 'docker rm samplerunning'
+            steps {
+                catchError(buildResult: 'SUCCESS') {
+                    sh 'docker stop samplerunning'
+                    sh 'docker rm samplerunning'
+                }
             }
         }
         stage('Build') {
-            build 'BuildSampleApp'
+            steps {
+                sh 'bash ./sample-app.sh'
+            }
         }
         stage('Results') {
-            build 'TestSampleApp'
+            steps {
+                sh 'curl http://172.17.0.3:5050/ | grep "You are calling me from 172.17.0.2"'
+            }
         }
     }
+}
