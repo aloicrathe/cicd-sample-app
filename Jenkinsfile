@@ -17,6 +17,7 @@ pipeline {
         }
         stage('Results') {
             steps {
+                sleep 5
                 sh 'curl http://172.17.0.3:5050/ | grep "You are calling me from 172.17.0.2"'
             }
         }
