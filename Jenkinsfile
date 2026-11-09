@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
     stages {
         stage('Preparation') {
             steps {
@@ -17,7 +20,7 @@ pipeline {
         }
         stage('Results') {
             steps {
-                sleep 5
+                sleep 3
                 sh 'curl http://172.17.0.3:5050/ | grep "You are calling me from 172.17.0.2"'
             }
         }
