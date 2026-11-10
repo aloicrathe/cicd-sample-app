@@ -7,13 +7,10 @@ pipeline {
         stage('Preparation') {
             steps {
                 sh 'rm -rf tempdir'
-                catchError(buildResult: 'SUCCESS') {
-                    sh 'docker stop samplerunning'
-                    sh 'docker rm samplerunning'
-                }
+                sh 'docker rm -f samplerunning || true'
             }
         }
-        stage('Build') {
+        stage('Build & deploy staging') {
             steps {
                 sh 'bash ./sample-app.sh'
             }
@@ -22,6 +19,17 @@ pipeline {
             steps {
                 sleep 3
                 sh 'curl http://172.17.0.3:5050/ | grep "You are calling me from 172.17.0.2"'
+            }
+        }
+        stage('Deploy production') {
+            steps {
+                sshagent(credentials: ['dmz010-deploy']) {
+                    withEnv(['DOCKER_HOST=ssh://deploy@192.0.2.10']) {
+                        sh 'rm -rf tempdir'
+                        sh 'docker rm -f samplerunning || true'
+                        sh 'bash ./sample-app.sh'
+                    }
+                }
             }
         }
     }
